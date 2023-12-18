@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "680016498283",
+    "project_id": "biostix-db02e",
+    "storage_bucket": "biostix-db02e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:680016498283:android:a9f6016092c400f8136b2e",
+        "android_client_info": {
+          "package_name": "com.example.biostix"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDL02A3-Hpmy7KO5GV9FV8BcuCclDbdAmk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

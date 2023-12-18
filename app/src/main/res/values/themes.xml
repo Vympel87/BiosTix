@@ -1,0 +1,15 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.BiosTix" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+         <item name="colorPrimary">@color/rose</item>
+         <item name="colorPrimaryVariant">@color/indigo</item>
+         <item name="android:statusBarColor">@color/indigo</item>
+    </style>
+
+    <style name="Theme.BiosTix" parent="Base.Theme.BiosTix"/>
+
+    <style name="App.Custom.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/indigo</item>
+    </style>
+</resources>
