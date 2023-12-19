@@ -5,6 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.biostix.databinding.FragmentUserMovieBinding
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -17,6 +23,11 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class UserMovie : Fragment() {
+
+    private lateinit var binding: FragmentUserMovieBinding
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var movieAdapter: MovieAdapter
+
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -32,9 +43,42 @@ class UserMovie : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_movie, container, false)
+        binding = FragmentUserMovieBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        recyclerView = binding.listMovie
+
+        movieAdapter = MovieAdapter(ArrayList())
+        recyclerView.adapter = movieAdapter
+
+        retrieveData()
+    }
+
+    private fun retrieveData() {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("movie")
+            .get()
+            .addOnSuccessListener { documents ->
+                val movieSnapshots = ArrayList<DocumentSnapshot>()
+                for (document in documents) {
+                    movieSnapshots.add(document)
+                }
+
+                movieAdapter = MovieAdapter(movieSnapshots)
+                binding.listMovie.layoutManager = LinearLayoutManager(requireContext())
+                binding.listMovie.adapter = movieAdapter
+                movieAdapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(context, "Failed to fetch data: $exception", Toast.LENGTH_SHORT).show()
+            }
     }
 
     companion object {

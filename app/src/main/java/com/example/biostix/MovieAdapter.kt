@@ -31,7 +31,7 @@ class MovieAdapter(private val movieList: ArrayList<DocumentSnapshot>) :
         val image = currentItem.getString("image") ?: ""
 
         holder.movieTitle.text = title
-        holder.movieGenre.text = genres.joinToString(", ")
+        holder.movieGenre.text = genres.joinToString(" ")
         holder.movieDuration.text = duration
 
         Glide.with(holder.itemView.context)
@@ -79,4 +79,3 @@ class MovieAdapter(private val movieList: ArrayList<DocumentSnapshot>) :
             }
     }
 }
-

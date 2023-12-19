@@ -35,7 +35,7 @@ class CreateActivity : AppCompatActivity() {
         "Fable"
     )
     private var selectedGenre = BooleanArray(genreArray.size)
-    private val genreList = mutableListOf<String>()
+    private val genreList = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -16,13 +16,12 @@ class AdminActivity : AppCompatActivity() {
         binding = ActivityAdminBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.AdminProfile.setOnClickListener {
+        binding.adminProfile.setOnClickListener {
             goToFragment(AdminProfile())
         }
-        binding.AdminProfile.setOnClickListener {
+        binding.adminMovie.setOnClickListener {
             goToFragment(AdminCRUD())
         }
-
     }
 
     private fun goToFragment(fragment: Fragment) {

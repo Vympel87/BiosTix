@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.example.biostix.databinding.ActivityUpdateBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 
 class UpdateActivity : AppCompatActivity() {
 
@@ -25,7 +26,7 @@ class UpdateActivity : AppCompatActivity() {
         "Another World", "Slice Of Life", "Religion", "Fable"
     )
     private var selectedGenre = BooleanArray(genreArray.size)
-    private val genreList = mutableListOf<String>()
+    private val genreList = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,30 +52,53 @@ class UpdateActivity : AppCompatActivity() {
         }
     }
 
+    private lateinit var oldImageRef: StorageReference
+
     private fun getOldMovieData(movieId: String) {
-        dbReference.document(movieId)
-            .get()
+        dbReference.document(movieId).get()
             .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val oldMovieData = document.toObject(MovieData::class.java)
-                    oldMovieData?.let {
-                        // Tampilkan data lama di UI
-                        binding.updateTitle.setText(it.title)
-                        binding.updateDuration.setText(it.duration)
-                        binding.updateDesc.setText(it.desc)
-                        imageUri = Uri.parse(it.image)
-                        Glide.with(this)
-                            .load(it.image)
-                            .into(binding.imageUpload)
-                        // Simpan data lama
-                        movieData = it
+                if (document != null) {
+                    val movieData = document.toObject(MovieData::class.java)
+                    if (movieData != null) {
+                        val oldTitle = movieData.title
+                        val oldDuration = movieData.duration
+                        val oldDesc = movieData.desc
+                        val oldImageUrl = movieData.image
+                        val oldGenres = movieData.genres
+
+                        if (oldImageUrl != null) {
+                            Glide.with(this)
+                                .load(oldImageUrl)
+                                .into(binding.imageUpload)
+                            oldImageRef = FirebaseStorage.getInstance().reference.child(oldImageUrl)
+                        } else {
+                            binding.imageUpload.setImageResource(R.drawable.palceholder_image)
+                        }
+
+                        binding.updateTitle.setText(oldTitle)
+                        binding.updateDuration.setText(oldDuration)
+                        binding.updateDesc.setText(oldDesc)
+
+                        if (oldGenres != null) {
+                            genreList.clear()
+                            selectedGenre.fill(false)
+                            oldGenres.forEach { genre ->
+                                val index = genreArray.indexOf(genre)
+                                if (index != -1) {
+                                    genreList.add(genre)
+                                    selectedGenre[index] = true
+                                }
+                            }
+                        }
                     }
-                } else {
-                    Toast.makeText(this, "Document does not exist", Toast.LENGTH_SHORT).show()
                 }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Error fetching document: $e", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Failed to get old movie data: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
@@ -118,7 +142,6 @@ class UpdateActivity : AppCompatActivity() {
         val updatedDesc = binding.updateDesc.text.toString()
 
         if (updatedTitle.isNotEmpty() && updatedDuration.isNotEmpty() && updatedDesc.isNotEmpty() && imageUri != null) {
-            // Menyimpan gambar baru ke Firebase Storage
             val storageRef = FirebaseStorage.getInstance().reference.child("Images")
             val imageRef = imageUri?.let { uri ->
                 val fileExtension = getFileExtension(uri)
@@ -141,6 +164,21 @@ class UpdateActivity : AppCompatActivity() {
                         dbReference.document(movieId)
                             .set(updatedMovieData)
                             .addOnSuccessListener {
+                                // Delete old image
+                                oldImageRef.delete().addOnSuccessListener {
+                                    Toast.makeText(
+                                        this,
+                                        "Old image deleted successfully",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }.addOnFailureListener { exception ->
+                                    Toast.makeText(
+                                        this,
+                                        "Failed to delete old image: ${exception.message}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
                                 Toast.makeText(
                                     this,
                                     "Data updated successfully!",

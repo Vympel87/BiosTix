@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.biostix.databinding.FragmentAdminCRUDBinding
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -70,15 +71,14 @@ class AdminCRUD : Fragment() {
                 }
 
                 movieAdapter = MovieAdapter(movieSnapshots)
-                binding.employeeRecyclerView.adapter = movieAdapter
+                binding.listMovie.layoutManager = LinearLayoutManager(requireContext())
+                binding.listMovie.adapter = movieAdapter
                 movieAdapter.notifyDataSetChanged()
             }
             .addOnFailureListener { exception ->
-                // Penanganan jika gagal mengambil data dari Firestore
                 Toast.makeText(context, "Failed to fetch data: $exception", Toast.LENGTH_SHORT).show()
             }
     }
-
     companion object {
         /**
          * Use this factory method to create a new instance of
