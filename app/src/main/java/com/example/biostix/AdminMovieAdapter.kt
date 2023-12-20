@@ -14,8 +14,8 @@ import com.bumptech.glide.Glide
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
-class MovieAdapter(private val movieList: ArrayList<DocumentSnapshot>) :
-    RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
+class AdminMovieAdapter(private val movieList: ArrayList<DocumentSnapshot>) :
+    RecyclerView.Adapter<AdminMovieAdapter.MovieViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_admin, parent, false)

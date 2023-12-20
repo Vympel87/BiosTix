@@ -25,7 +25,7 @@ private const val ARG_PARAM2 = "param2"
 class AdminCRUD : Fragment() {
 
     private lateinit var binding: FragmentAdminCRUDBinding
-    private lateinit var movieAdapter: MovieAdapter
+    private lateinit var movieAdapter: AdminMovieAdapter
     private val movieList = ArrayList<MovieData>()
 
     // TODO: Rename and change types of parameters
@@ -70,7 +70,7 @@ class AdminCRUD : Fragment() {
                     movieSnapshots.add(document)
                 }
 
-                movieAdapter = MovieAdapter(movieSnapshots)
+                movieAdapter = AdminMovieAdapter(movieSnapshots)
                 binding.listMovie.layoutManager = LinearLayoutManager(requireContext())
                 binding.listMovie.adapter = movieAdapter
                 movieAdapter.notifyDataSetChanged()

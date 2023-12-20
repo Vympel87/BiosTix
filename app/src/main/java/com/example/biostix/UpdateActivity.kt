@@ -52,7 +52,7 @@ class UpdateActivity : AppCompatActivity() {
         }
     }
 
-    private lateinit var oldImageRef: StorageReference
+    private var oldImageRef: StorageReference? = null
 
     private fun getOldMovieData(movieId: String) {
         dbReference.document(movieId).get()
@@ -73,6 +73,7 @@ class UpdateActivity : AppCompatActivity() {
                             oldImageRef = FirebaseStorage.getInstance().reference.child(oldImageUrl)
                         } else {
                             binding.imageUpload.setImageResource(R.drawable.palceholder_image)
+                            oldImageRef = null // This is now allowed
                         }
 
                         binding.updateTitle.setText(oldTitle)
@@ -165,13 +166,13 @@ class UpdateActivity : AppCompatActivity() {
                             .set(updatedMovieData)
                             .addOnSuccessListener {
                                 // Delete old image
-                                oldImageRef.delete().addOnSuccessListener {
+                                oldImageRef?.delete()?.addOnSuccessListener {
                                     Toast.makeText(
                                         this,
                                         "Old image deleted successfully",
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                }.addOnFailureListener { exception ->
+                                }?.addOnFailureListener { exception ->
                                     Toast.makeText(
                                         this,
                                         "Failed to delete old image: ${exception.message}",

@@ -1,20 +1,22 @@
 package com.example.biostix
 
+import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Patterns
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.example.biostix.databinding.ActivitySignInBinding
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.FirebaseFirestore
 
 class SignInActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySignInBinding
-    private val firestore = Firebase.firestore
     private lateinit var auth: FirebaseAuth
+    private lateinit var sharedPreferences: SharedPreferences
+    private val firestore = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,15 +24,12 @@ class SignInActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         auth = FirebaseAuth.getInstance()
+        sharedPreferences = getSharedPreferences("login_pref", Context.MODE_PRIVATE)
 
-        binding.keSignUp.setOnClickListener {
-            val intentToLogin = Intent(this, SignUpActivity::class.java)
-            startActivity(intentToLogin)
-        }
-
-        binding.lupaPw.setOnClickListener {
-            val intentToLogin = Intent(this, ForgotPassword::class.java)
-            startActivity(intentToLogin)
+        val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
+        if (isLoggedIn) {
+            navigateToHome()
+            finish()
         }
 
         binding.btnSignIn.setOnClickListener {
@@ -44,7 +43,11 @@ class SignInActivity : AppCompatActivity() {
                             val currentUser = auth.currentUser
                             val uid = currentUser?.uid
 
-                            val userRef = uid?.let { firestore.collection("users").document(it) }
+                            val editor = sharedPreferences.edit()
+                            editor.putBoolean("isLoggedIn", true)
+                            editor.apply()
+
+                            val userRef = uid?.let { uid -> firestore.collection("users").document(uid) }
 
                             userRef?.get()?.addOnSuccessListener { documentSnapshot ->
                                 val isAdmin = documentSnapshot.getBoolean("isAdmin")
@@ -52,9 +55,9 @@ class SignInActivity : AppCompatActivity() {
                                 if (isAdmin == true) {
                                     val intent = Intent(this, AdminActivity::class.java)
                                     startActivity(intent)
+                                    finish()
                                 } else {
-                                    val intent = Intent(this, MainActivity::class.java)
-                                    startActivity(intent)
+                                    navigateToHome()
                                 }
                             }?.addOnFailureListener { e ->
                                 Toast.makeText(this, "Failed to get user data: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -66,28 +69,38 @@ class SignInActivity : AppCompatActivity() {
                     }
             }
         }
+
+        binding.keSignUp.setOnClickListener {
+            val intentToSignUp = Intent(this, SignUpActivity::class.java)
+            startActivity(intentToSignUp)
+        }
     }
 
     private fun checkAllField(email: String, password: String): Boolean {
-        when {
+        return when {
             email.isEmpty() -> {
                 binding.layoutEmail.error = "Required email"
-                return false
+                false
             }
             !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
                 binding.layoutEmail.error = "Invalid email format"
-                return false
+                false
             }
             password.isEmpty() -> {
                 binding.layoutPassword.error = "Required password"
-                return false
+                false
             }
             password.length <= 8 -> {
                 binding.layoutPassword.error = "Password should be at least 8 characters"
-                return false
+                false
             }
-            else -> return true
+            else -> true
         }
     }
-}
 
+    private fun navigateToHome() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+}

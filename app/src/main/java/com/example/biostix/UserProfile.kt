@@ -1,14 +1,15 @@
 package com.example.biostix
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Patterns
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.Toast
 import com.example.biostix.databinding.FragmentUserProfileBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -29,6 +30,7 @@ class UserProfile : Fragment() {
 
     private lateinit var binding: FragmentUserProfileBinding
     private lateinit var auth: FirebaseAuth
+    private lateinit var sharedPreferences: SharedPreferences
 
     // TODO: Rename and change types of parameters
     private var param1: String? = null
@@ -41,6 +43,8 @@ class UserProfile : Fragment() {
             param2 = it.getString(ARG_PARAM2)
         }
         auth = FirebaseAuth.getInstance()
+
+        sharedPreferences = requireContext().getSharedPreferences("login_pref", Context.MODE_PRIVATE)
     }
 
     override fun onCreateView(
@@ -56,10 +60,9 @@ class UserProfile : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.btnSignOut.setOnClickListener {
-            auth.signOut()
-            val intent = Intent(requireContext(), SignInActivity::class.java)
-            startActivity(intent)
-            requireActivity().finish()
+            Firebase.auth.signOut()
+            updateLoginStatus(false)
+            navigateToSignIn()
         }
 
         binding.btnUpPassword.setOnClickListener {
@@ -149,6 +152,20 @@ class UserProfile : Fragment() {
             }
         val alertDialog: AlertDialog = builder.create()
         alertDialog.show()
+    }
+
+    private fun updateLoginStatus(status: Boolean) {
+        val sharedPreferences = requireContext().getSharedPreferences("login_pref", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putBoolean("isLoggedIn", status)
+        editor.apply()
+    }
+
+    private fun navigateToSignIn() {
+        val intent = Intent(requireContext(), SignInActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        requireActivity().finish()
     }
 
     companion object {

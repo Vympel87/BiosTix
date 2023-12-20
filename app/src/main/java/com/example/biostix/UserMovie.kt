@@ -1,50 +1,26 @@
 package com.example.biostix
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.biostix.databinding.FragmentUserMovieBinding
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [UserMovie.newInstance] factory method to
- * create an instance of this fragment.
- */
 class UserMovie : Fragment() {
 
     private lateinit var binding: FragmentUserMovieBinding
     private lateinit var recyclerView: RecyclerView
-    private lateinit var movieAdapter: MovieAdapter
-
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var movieAdapter: UserMovieAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
         binding = FragmentUserMovieBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -53,9 +29,9 @@ class UserMovie : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerView = binding.listMovie
-
-        movieAdapter = MovieAdapter(ArrayList())
+        movieAdapter = UserMovieAdapter(ArrayList())
         recyclerView.adapter = movieAdapter
+        recyclerView.layoutManager = GridLayoutManager(requireContext(), 2) // Ubah jumlah kolom di sini
 
         retrieveData()
     }
@@ -66,38 +42,13 @@ class UserMovie : Fragment() {
         db.collection("movie")
             .get()
             .addOnSuccessListener { documents ->
-                val movieSnapshots = ArrayList<DocumentSnapshot>()
-                for (document in documents) {
-                    movieSnapshots.add(document)
-                }
-
-                movieAdapter = MovieAdapter(movieSnapshots)
-                binding.listMovie.layoutManager = LinearLayoutManager(requireContext())
-                binding.listMovie.adapter = movieAdapter
+                val movieSnapshots = ArrayList(documents.documents)
+                movieAdapter = UserMovieAdapter(movieSnapshots)
+                recyclerView.adapter = movieAdapter
                 movieAdapter.notifyDataSetChanged()
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(context, "Failed to fetch data: $exception", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment UserMovie.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            UserMovie().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
             }
     }
 }
