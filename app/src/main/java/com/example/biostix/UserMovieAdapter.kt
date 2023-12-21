@@ -9,8 +9,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.DocumentSnapshot
 
-class UserMovieAdapter(private val movieList: ArrayList<DocumentSnapshot>) :
-    RecyclerView.Adapter<UserMovieAdapter.MovieViewHolder>() {
+class UserMovieAdapter(
+    private val movieList: ArrayList<DocumentSnapshot>,
+    private val listener: OnItemClickListener
+) : RecyclerView.Adapter<UserMovieAdapter.MovieViewHolder>() {
+
+    interface OnItemClickListener {
+        fun onItemClick(documentSnapshot: DocumentSnapshot)
+    }
+
+    fun setData(newList: List<DocumentSnapshot>) {
+        movieList.clear()
+        movieList.addAll(newList)
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_guest, parent, false)
@@ -28,6 +40,10 @@ class UserMovieAdapter(private val movieList: ArrayList<DocumentSnapshot>) :
         Glide.with(holder.itemView.context)
             .load(image)
             .into(holder.movieImage)
+
+        holder.itemView.setOnClickListener {
+            listener.onItemClick(currentItem)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -39,3 +55,4 @@ class UserMovieAdapter(private val movieList: ArrayList<DocumentSnapshot>) :
         val movieImage: ImageView = itemView.findViewById(R.id.movie_image)
     }
 }
+

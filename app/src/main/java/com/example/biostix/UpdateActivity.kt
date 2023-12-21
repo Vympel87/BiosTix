@@ -73,7 +73,7 @@ class UpdateActivity : AppCompatActivity() {
                             oldImageRef = FirebaseStorage.getInstance().reference.child(oldImageUrl)
                         } else {
                             binding.imageUpload.setImageResource(R.drawable.palceholder_image)
-                            oldImageRef = null // This is now allowed
+                            oldImageRef = null
                         }
 
                         binding.updateTitle.setText(oldTitle)

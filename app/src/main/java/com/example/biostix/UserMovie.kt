@@ -1,5 +1,6 @@
 package com.example.biostix
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,9 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.biostix.databinding.FragmentUserMovieBinding
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
-class UserMovie : Fragment() {
+class UserMovie : Fragment(), UserMovieAdapter.OnItemClickListener {
 
     private lateinit var binding: FragmentUserMovieBinding
     private lateinit var recyclerView: RecyclerView
@@ -29,11 +31,27 @@ class UserMovie : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerView = binding.listMovie
-        movieAdapter = UserMovieAdapter(ArrayList())
+        movieAdapter = UserMovieAdapter(ArrayList(), this)
         recyclerView.adapter = movieAdapter
-        recyclerView.layoutManager = GridLayoutManager(requireContext(), 2) // Ubah jumlah kolom di sini
+        recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
 
         retrieveData()
+    }
+
+    override fun onItemClick(documentSnapshot: DocumentSnapshot) {
+        val title = documentSnapshot.getString("title") ?: ""
+        val genres = documentSnapshot.get("genres") as? ArrayList<String> ?: ArrayList()
+        val duration = documentSnapshot.getString("duration") ?: ""
+        val image = documentSnapshot.getString("image") ?: ""
+        val description = documentSnapshot.getString("description") ?: ""
+
+        val intent = Intent(requireContext(), UserDetailMovie::class.java)
+        intent.putExtra("title", title)
+        intent.putStringArrayListExtra("genres", genres)
+        intent.putExtra("duration", duration)
+        intent.putExtra("image", image)
+        intent.putExtra("description", description)
+        startActivity(intent)
     }
 
     private fun retrieveData() {
@@ -43,9 +61,7 @@ class UserMovie : Fragment() {
             .get()
             .addOnSuccessListener { documents ->
                 val movieSnapshots = ArrayList(documents.documents)
-                movieAdapter = UserMovieAdapter(movieSnapshots)
-                recyclerView.adapter = movieAdapter
-                movieAdapter.notifyDataSetChanged()
+                movieAdapter.setData(movieSnapshots)
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(context, "Failed to fetch data: $exception", Toast.LENGTH_SHORT).show()

@@ -7,6 +7,8 @@ data class MovieData(
     var desc: String? = null,
     var image: String? = null
 ) {
+    constructor() : this(null, ArrayList(), null, null, null)
+
     constructor(
         titleArg: String?,
         genresArg: ArrayList<String>,

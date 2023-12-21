@@ -32,6 +32,11 @@ class SignInActivity : AppCompatActivity() {
             finish()
         }
 
+        binding.lupaPw.setOnClickListener {
+            val intentToSignUp = Intent(this, ForgotPassword::class.java)
+            startActivity(intentToSignUp)
+        }
+
         binding.btnSignIn.setOnClickListener {
             val email = binding.inEmail.text.toString()
             val password = binding.inPassword.text.toString()
