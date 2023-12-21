@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.util.Log
 import com.bumptech.glide.Glide
 import com.example.biostix.databinding.ActivityUserDetailMovieBinding
+import com.example.biostix.databinding.FragmentUserMovieBinding
+import com.google.firebase.firestore.auth.User
 
 class UserDetailMovie : AppCompatActivity() {
 
@@ -14,6 +16,10 @@ class UserDetailMovie : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityUserDetailMovieBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.btnBack.setOnClickListener {
+            onBackPressed()
+        }
 
         val title = intent.getStringExtra("title")
         val genres = intent.getStringArrayListExtra("genres")
