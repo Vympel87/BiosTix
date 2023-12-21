@@ -2,6 +2,7 @@ package com.example.biostix
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.bumptech.glide.Glide
 import com.example.biostix.databinding.ActivityUserDetailMovieBinding
 
@@ -20,13 +21,18 @@ class UserDetailMovie : AppCompatActivity() {
         val description = intent.getStringExtra("description")
         val image = intent.getStringExtra("image")
 
+        Log.d("Description", "Description received: $description")
+
         binding.titleMovie.text = title
-        binding.genres.text = genres?.joinToString(", ") ?: ""
+        val genresString = genres?.joinToString(", ")
+        val genresNoComma = genresString?.replace(",", "")
+        binding.genres.text = genresNoComma ?: ""
         binding.duration.text = duration
-        binding.titleDescMovie.text = description
+        binding.deskripsiMovie.text = description ?: ""
 
         Glide.with(this)
             .load(image)
             .into(binding.imageDetailMovie)
     }
+
 }

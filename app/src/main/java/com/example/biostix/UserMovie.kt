@@ -40,14 +40,15 @@ class UserMovie : Fragment(), UserMovieAdapter.OnItemClickListener {
 
     override fun onItemClick(documentSnapshot: DocumentSnapshot) {
         val title = documentSnapshot.getString("title") ?: ""
-        val genres = documentSnapshot.get("genres") as? ArrayList<String> ?: ArrayList()
+        val genresList  = documentSnapshot.get("genres") as? ArrayList<String> ?: ArrayList()
+        val genres = genresList.joinToString(", ")
         val duration = documentSnapshot.getString("duration") ?: ""
         val image = documentSnapshot.getString("image") ?: ""
-        val description = documentSnapshot.getString("description") ?: ""
+        val description = documentSnapshot.getString("desc") ?: ""
 
         val intent = Intent(requireContext(), UserDetailMovie::class.java)
         intent.putExtra("title", title)
-        intent.putStringArrayListExtra("genres", genres)
+        intent.putStringArrayListExtra("genres", genresList)
         intent.putExtra("duration", duration)
         intent.putExtra("image", image)
         intent.putExtra("description", description)
